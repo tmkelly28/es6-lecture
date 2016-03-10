@@ -5,4 +5,5 @@
 *   Everything after babel-register will be able to use ES6!
 */
 require("babel-register");
+require('babel-polyfill');
 require('./app');
