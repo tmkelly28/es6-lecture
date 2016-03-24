@@ -19,11 +19,13 @@ function main () {
           let responseBody = '';
           http.get({
             host: 'api.bandsintown.com',
-            path: '/artists/' + bandName.replace(/\s/g, '%20') + '/events.json?app_id=ES6_LECTURE'
+            path: `/artists/${bandName.replace(/\s/g, '%20')}/events.json?app_id=ES6_LECTURE`
           }, res => {
             res.on('data', data => responseBody += data);
             res.on('end', () => {
-              console.log(JSON.parse(responseBody));
+              let events = JSON.parse(responseBody);
+              console.log(`${bandName} has ${events.length} concerts coming up!`);
+              main();
             })
           })
           .on('error', error => console.error);
