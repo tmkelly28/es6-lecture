@@ -1,24 +1,21 @@
 'use strict';
 
-import * as http from 'http';
+import fetch from './fetch';
+import prompt from './prompt';
 
-export default function search (rl, done) {
-  rl.question('Enter an artist to search for > ', bandName => {
-    let responseBody = '';
-    http.get({
-      host: 'api.bandsintown.com',
-      path: `/artists/${bandName.replace(/\s/g, '%20')}/events.json?app_id=ES6_LECTURE`
-    }, res => {
-      res.on('data', data => responseBody += data);
-      res.on('end', () => {
-        let events = JSON.parse(responseBody);
-        console.log(`${bandName} has ${events.length} concerts coming up!`);
-        done();
-      })
+export default function search (done) {
+  let _bandName;
+  prompt('Enter an artist to search for > ')
+    .then(bandName => {
+      _bandName = bandName;
+      return fetch(bandName);
     })
-    .on('error', error => {
+    .then(events => {
+      console.log(`${_bandName} has ${events.length} concerts coming up!`);
+      done();
+    })
+    .catch(error => {
       console.error(error);
       done();
     });
-  });
 }
