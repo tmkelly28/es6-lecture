@@ -12,23 +12,23 @@ function* generateEvents (events) {
   }
 }
 
-function cycleEvents (it, done) {
+function cycleEvents (it, schedule, done) {
   let result = it.next();
-  if (result.done) done();
+  if (result.done) schedule.save()
+    .then(savedSchedule => done(savedSchedule))
+    .catch(console.error);
   else result.value
     .then(response => {
-      if (response.answer === 'y') console.log(`
-        Added the show at ${response.event.venue.name} to the schedule!
-      `);
-      cycleEvents(it, done);
+      if (response.answer === 'y') schedule.add(response.event);
+      cycleEvents(it, schedule, done);
     })
     .catch(err => {
       console.error(err);
-      cycleEvents(it, done);
+      cycleEvents(it, schedule, done);
     });
 }
 
-export default function search (done) {
+export default function search (schedule, done) {
   let _bandName;
   prompt('Enter an artist to search for > ')
     .then(bandName => {
@@ -41,10 +41,10 @@ export default function search (done) {
         Upcoming concerts for ${_bandName} in NY/NJ
       `);
       let it = generateEvents(events);
-      cycleEvents(it, done);
+      cycleEvents(it, schedule, done);
     })
     .catch(error => {
       console.error(error);
-      done();
+      done(schedule);
     });
 }
