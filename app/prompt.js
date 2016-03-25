@@ -14,3 +14,11 @@ export default function prompt (ques) {
     });
   });
 }
+
+export function promptForEvent (event, ques) {
+  return new Promise((resolve, reject) => {
+    rl.question(ques, answer => {
+      answer ? resolve({answer: answer, event: event}) : reject('No command given');
+    })
+  })
+}
